@@ -43,7 +43,7 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      TAG: laurence79/letsencrypt-gcloud-balancer
+      DOCKERHUB_REPO: laurence79/letsencrypt-gcloud-balancer
       VERSION: ${{ needs.semantic_release.outputs.new_release_git_tag }}
       
     steps:
@@ -61,6 +61,6 @@ jobs:
         with:
           push: true
           tags: |
-            "${{ env.TAG }}:${{ env.VERSION }}"
-            "${{ env.TAG }}:latest"
+            "${{ env.DOCKERHUB_REPO }}:${{ env.VERSION }}"
+            "${{ env.DOCKERHUB_REPO }}:latest"
       
