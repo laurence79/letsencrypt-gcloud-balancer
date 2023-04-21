@@ -1,23 +1,18 @@
-FROM debian:jessie
+FROM debian:bullseye
 
 WORKDIR /root
 
-RUN apt-get update \
-    && apt-get install -y wget python xz-utils cron git \
-    && rm -rf /var/lib/apt/lists/*
+RUN apt-get clean && apt-get update \
+    && apt-get install -y wget python xz-utils git apt-transport-https ca-certificates gnupg curl
 
-RUN wget https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-sdk-176.0.0-linux-x86_64.tar.gz \
-    && tar -zxf google-cloud-sdk-176.0.0-linux-x86_64.tar.gz \
-    && ./google-cloud-sdk/install.sh --usage-reporting false \
-    && rm google-cloud-sdk-176.0.0-linux-x86_64.tar.gz
+RUN echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] http://packages.cloud.google.com/apt cloud-sdk main" \
+    | tee -a /etc/apt/sources.list.d/google-cloud-sdk.list && curl https://packages.cloud.google.com/apt/doc/apt-key.gpg \
+    | tee /usr/share/keyrings/cloud.google.gpg && apt-get update -y && apt-get install google-cloud-sdk -y
 
-RUN wget https://github.com/go-acme/lego/releases/download/v3.0.2/lego_v3.0.2_linux_amd64.tar.gz \
-    && tar -xzf lego_v3.0.2_linux_amd64.tar.gz lego \
-    && rm lego_v3.0.2_linux_amd64.tar.gz
+RUN wget https://github.com/go-acme/lego/releases/download/v4.10.2/lego_v4.10.2_linux_amd64.tar.gz \
+    && tar -xzf lego_v4.10.2_linux_amd64.tar.gz lego \
+    && rm lego_v4.10.2_linux_amd64.tar.gz
 
-COPY init.sh /root/init.sh
-COPY monthly.sh /root/monthly.sh
+COPY run.sh /root/run.sh
 
-COPY crontab /etc/cron.d/letsencrypt
-
-CMD /root/init.sh && cron -f
+CMD /root/run.sh

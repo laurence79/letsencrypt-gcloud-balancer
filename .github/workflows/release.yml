@@ -1,0 +1,66 @@
+name: Release
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  semantic_release:
+    name: Release
+    runs-on: ubuntu-latest
+    outputs:
+      new_release_published: ${{ steps.semantic.outputs.new_release_published }}
+      new_release_version: ${{ steps.semantic.outputs.new_release_version }}
+      new_release_git_tag: ${{ steps.semantic.outputs.new_release_git_tag }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          persist-credentials: false
+
+      - name: Setup Node
+        uses: actions/setup-node@v2
+        with:
+          node-version: "14"
+
+      - id: semantic
+        name: Semantic Release
+        uses: cycjimmy/semantic-release-action@v3.4.2
+        with:
+          semantic_version: "18.0.0"
+          extra_plugins: |
+            @semantic-release/changelog
+            @semantic-release/npm
+            @semantic-release/exec
+            @semantic-release/git
+        env:
+          GITHUB_TOKEN: ${{ secrets.PAT }}
+
+  build:
+    name: Build
+    needs: [semantic_release]
+    if: needs.semantic_release.outputs.new_release_published == 'true'
+    runs-on: ubuntu-latest
+
+    env:
+      TAG: laurence79/letsencrypt-gcloud-balancer
+      VERSION: ${{ needs.semantic_release.outputs.new_release_git_tag }}
+      
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: laurence79
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      
+      - name: Build and push
+        uses: docker/build-push-action@v4
+        with:
+          push: true
+          tags: |
+            "${{ env.TAG }}:${{ env.VERSION }}"
+            "${{ env.TAG }}:latest"
+      
