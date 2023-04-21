@@ -20,7 +20,7 @@ CERT_ID=${CERT_ID_PREFIX:-cert}-$(cat /dev/urandom | tr -dc 'a-z' | fold -w 16 |
 OLD_CERT_ID=$(gcloud -q compute target-https-proxies list --filter "name=${TARGET_PROXY}" | sed -n 2p | awk '{print $2}')
 
 # Generate new gcloud certificate and attach to https proxy
-[[ ! -v GCE_REGION ]] && REGION_ARGS="--region=$GCE_REGION"
+[[ -v GCE_REGION ]] && REGION_ARGS="--region=$GCE_REGION"
 gcloud -q compute ssl-certificates create $CERT_ID --certificate=cert.crt --private-key=/root/.lego/certificates/$KEY $REGION_ARGS
 gcloud -q compute target-https-proxies update $TARGET_PROXY --ssl-certificates $CERT_ID $REGION_ARGS
 rm cert.crt
