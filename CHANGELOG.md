@@ -1,3 +1,10 @@
+## [1.0.1](https://github.com/laurence79/letsencrypt-gcloud-balancer/compare/v1.0.0...v1.0.1) (2023-04-21)
+
+
+### Bug Fixes
+
+* Region argument inference is inverted ([116e38e](https://github.com/laurence79/letsencrypt-gcloud-balancer/commit/116e38ee16cf0fb42d96197d6301f8c6b7b08600))
+
 # 1.0.0 (2023-04-21)
 
 
