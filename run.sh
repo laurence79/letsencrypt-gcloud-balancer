@@ -26,4 +26,4 @@ gcloud -q compute target-https-proxies update $TARGET_PROXY --ssl-certificates $
 rm cert.crt
 
 # Remove old, unused certificate
-gcloud -q compute ssl-certificates delete $OLD_CERT_ID
+gcloud -q compute ssl-certificates delete $OLD_CERT_ID $REGION_ARGS
